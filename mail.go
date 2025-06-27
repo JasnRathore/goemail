@@ -31,7 +31,7 @@ func NewProfile(name, userName, from, host, password string) MailProfile {
 	}
 }
 
-func (mp *MailProfile) SendMail(to, subject, body string, attachments []MailAttachment, useTrackingImage bool) error {
+func (mp *MailProfile) SendMail(to, subject, body string, attachments []MailAttachment) error {
 	m := gomail.NewMessage()
 	m.SetHeader("From", mp.From)
 	m.SetHeader("To", to)
@@ -48,6 +48,37 @@ func (mp *MailProfile) SendMail(to, subject, body string, attachments []MailAtta
 
 	host, port, err := mp.parseHostPort()
 
+	if err != nil {
+		return err
+	}
+
+	d := gomail.NewDialer(host, port, mp.UserName, mp.Password)
+	return d.DialAndSend(m)
+}
+
+func (mp *MailProfile) SendMailWithTracking(
+	to, subject, body string,
+	attachments []MailAttachment,
+	trackingLink string,
+) error {
+	trackingImg := fmt.Sprintf(`<img src="%s" width="1" height="1" style="display:none;" alt="" />`, trackingLink)
+	bodyWithTracking := body + trackingImg
+
+	m := gomail.NewMessage()
+	m.SetHeader("From", mp.From)
+	m.SetHeader("To", to)
+	m.SetHeader("Subject", subject)
+	m.SetBody("text/html", bodyWithTracking)
+
+	for _, att := range attachments {
+		data := att.Data
+		m.Attach(att.FileName, gomail.SetCopyFunc(func(w io.Writer) error {
+			_, err := w.Write(data)
+			return err
+		}))
+	}
+
+	host, port, err := mp.parseHostPort()
 	if err != nil {
 		return err
 	}
