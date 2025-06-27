@@ -24,7 +24,7 @@ func TestSendMail_InvalidHost(t *testing.T) {
 		Host:     "invalidhost",
 		Password: "password",
 	}
-	err := mp.SendMail("to@example.com", "Subject", "Body", nil, false)
+	err := mp.SendMail("to@example.com", "Subject", "Body", nil)
 	if err == nil {
 		t.Error("expected error for invalid host, got nil")
 	}
@@ -38,7 +38,7 @@ func TestSendMail_EmptyRecipient(t *testing.T) {
 		Host:     "smtp.example.com:25",
 		Password: "password",
 	}
-	err := mp.SendMail("", "Subject", "Body", nil, false)
+	err := mp.SendMail("", "Subject", "Body", nil)
 	if err == nil {
 		t.Error("Expected error for empty recipient, got nil")
 	}
@@ -56,7 +56,7 @@ func TestSendMail_MultipleAttachments(t *testing.T) {
 		{FileName: "a.txt", Data: []byte("This file is named a.txt")},
 		{FileName: "b.txt", Data: []byte("This file is named b.txt")},
 	}
-	err := mp.SendMail("to@example.com", "Subject", "Body", attachments, false)
+	err := mp.SendMail("to@example.com", "Subject", "Body", attachments)
 	if err == nil {
 		t.Log("Multiple attachments sent (or at least, no error from gomail)")
 	} else {
