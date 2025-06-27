@@ -65,7 +65,7 @@ func TestSendMail_MultipleAttachments(t *testing.T) {
 }
 
 //change to actual Credentials
-//userName, From, targetemail in sendtestmail
+//userName, From, target, host
 func TestSendMail_ValidHost(t *testing.T) {
 	mp := MailProfile{
 		Name:     "Jordan Phisher",
@@ -74,7 +74,29 @@ func TestSendMail_ValidHost(t *testing.T) {
 		Host:     "smtp.gmail.com:587",
 		Password: "",
 	}
-	err := mp.SendTestMail("targetEmail.com")
+	target := "targetEmail.com"
+	err := mp.SendTestMail(target)
+	if err != nil {
+		t.Error("Expected To pass, Got error\n &v", err)
+	}
+}
+
+//change to actual Credentials
+//userName, From, target, host
+func TestSendMail_MultipleAttachments_valid(t *testing.T) {
+	mp := MailProfile{
+		Name:     "Jordan Phisher",
+		UserName: "yourEmail.com",
+		From:     "Jordan Phisher <yourEmail.com>",
+		Host:     "smtp.gmail.com:587",
+		Password: "",
+	}
+	target := "targetEmail.com"
+	attachments := []MailAttachment{
+		{FileName: "a.txt", Data: []byte("This file is named a.txt")},
+		{FileName: "b.txt", Data: []byte("This file is named b.txt")},
+	}
+	err := mp.SendMail(target, "Attachment Test", "2 text files are attached", attachments)
 	if err != nil {
 		t.Error("Expected To pass, Got error\n &v", err)
 	}
